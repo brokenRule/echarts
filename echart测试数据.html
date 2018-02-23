@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="echarts.js"></script>
+    <style type="text/css">
+        .chartData{
+            clear: both;
+            min-height: 450px;
+            width: 1000px;
+            margin: 30px auto;
+        }
+    </style>
+</head>
+<body>
+<div class="chartData" id="chartData"></div>
+<script type="text/javascript">
+    function addN(str) {
+        var result='';
+        for(var i=0,len=str.length;i<len;i++){
+            result += str[i];
+            result += '\n';
+        }
+        return result
+    };
+
+    function getMax(arr) {
+        var max = arr[0],obj ={};
+        for(var i = 0; i < arr.length; i++) {
+            if(max < arr[i]) {
+                max = arr[i];
+            }
+        }
+        if(max.toString().length<4){
+            obj.max = max;
+            obj.unit = '';
+            obj.divider = 1;
+        }
+        else if(max.toString().length <7){
+           /* obj.max = parseInt(max)/1000;*/
+            obj.max = max/1000;
+            obj.unit = 'k';
+            obj.divider = 1000;
+        }
+        else{
+           /* obj.max = parseInt(max)/10000;*/
+            obj.max = max/10000;
+            obj.unit = 'w';
+            obj.divider = 10000;
+        }
+        return obj;
+    };
+
+    function showData (obj) {
+        if(obj.unit == 'k'){
+            obj.showValue = obj.value*1000;
+        }
+        else if(obj.unit  == 'w'){
+            obj.showValue = obj.value*10000;
+            obj.showValue = Math.round(obj.showValue);
+        }
+        else {
+            obj.showValue = obj.value;
+        }
+        return obj.showValue;
+    };
+    function trueData(obj) {
+        if(obj.unit == 'k'){
+            obj.value = obj.value/1000;
+        }
+        else if(obj.unit  == 'w'){
+            obj.value = obj.value/10000;
+            if(/\./.test(obj.value)){
+                console.log(obj.value);
+            }
+        }
+        return obj.value;
+    }
+    function singleEcharts(obj){
+        var $this,myChart,dayArray = [],countsArray = [],dataAry = [],newArray = [],
+            firstColor = '',secondColor = '',yAxis_item = {},series_item = {},num = {};
+        $this = document.getElementById('chartData');
+        firstColor = '#3B68B8';secondColor = '#228764';
+        myChart = echarts.init($this);
+        for(var key in obj.list){
+            var item = obj.list[key].created;
+            var counts = obj.list[key].counts;
+          /*  counts = parseInt(counts);*/
+            dayArray.push(item);
+            dataAry.push({value:counts});
+            countsArray.push(counts);
+        }
+        num = getMax(countsArray);
+        for(var key in dataAry){
+            var item = dataAry[key].value;
+            dataAry[key].value = trueData({value:item,unit:num.unit});
+        }
+        // 指定图表的配置项和数据
+        yAxis_item = {
+            type: 'value',
+            min: 0,
+            max: num.max,
+            axisLabel: {
+                formatter: '{value}'+num.unit,
+                textStyle: {
+                    color: firstColor,
+                    fontSize:16
+                }
+            },
+            axisLine:{
+                show:false
+            },
+            axisTick: {
+                show: false
+            },
+            name:addN(obj.firstName),
+            nameLocation:"middle",
+            nameGap:55,
+            nameTextStyle:{
+                color:firstColor,
+                fontSize:16
+            },
+            nameRotate:0
+        };
+        series_item = {
+            type:'line',
+            symbolSize: 8,
+            itemStyle: {
+                normal: {
+                    /* areaStyle: {type: 'default',color:firstColor,'borderColor':firstColor},*/ //显示下面阴影面积
+                    color:firstColor,
+                    fontSize:16,
+                    lineStyle:{color:firstColor}
+                }
+            },
+            data:dataAry
+        };
+        var option = {
+            tooltip: {
+                alwaysShowContent: true,
+                bordeRadius: 3,
+                borderWidth: 1,
+                borderColor:'#cfcfcf',
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                padding: 10,
+                position: "top",
+                textStyle: {
+                    fontSize: 14,
+                    color: '#8F8F8F'
+                },
+                formatter: function (params) {
+                    var tip = "<div style='padding: 10px 0px;text-align:center;color:black;font-size: 20px;'>"+showData({value:params.data.value,unit:num.unit})+"</div>";
+                    return tip;
+                }
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {show: true, type: [ 'bar', 'stack', 'tiled']},
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : dayArray,
+                    axisLabel: {
+                        show: true,
+                        textStyle: {
+                            fontSize:'16'
+                        }
+                    }
+                }
+            ],
+            yAxis : [],
+            series : []
+        };
+        option.series.push(series_item);
+        option.yAxis.push(yAxis_item);
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    };
+    var list ,obj = {};
+    list = [
+        {"clazz":"total","counts":3000000,"created":20171029,"id":176,"system":"all"},
+        {"clazz":"total","counts":982,"created":20171100,"id":192,"system":"all"},
+        {"clazz":"total","counts":7700,"created":20171030,"id":183,"system":"all"},
+        {"clazz":"total","counts":15,"created":20171101,"id":201,"system":"all"},
+        {"clazz":"total","counts":111,"created":20171102,"id":210,"system":"all"},
+        {"clazz":"total","counts":127,"created":20171027,"id":166,"system":"all"},
+        {"clazz":"total","counts":10000,"created":20171028,"id":173,"system":"all"}
+        ];
+    obj.list = list;
+    obj.firstName = '活跃人数';
+    singleEcharts(obj);
+
+</script>
+</body>
+</html>

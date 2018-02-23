@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>折线图标</title>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="echarts.js"></script>
+</head>
+<body>
+<div id="main" style="height:400px;margin-top: 100px"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    var firstColor = "#AF1224",secondColor = "#32C7E4",yAxis_item = {},yAxis_item_Bi = {};
+    var str1 = '资讯更新量';
+    var str2 = '资讯阅读量';
+    function addN(str) {
+        var result='';
+        for(var i=0,len=str.length;i<len;i++){
+            result += str[i];
+            result += '\n';
+        }
+        return result
+    }
+    // 指定图表的配置项和数据
+    yAxis_item = {
+        type: 'value',
+        min: 0,
+        axisLabel: {
+            formatter: '{value} k',
+            textStyle: {
+                color: firstColor,
+                fontSize:16
+            },
+            margin:'15'
+        },
+        axisLine:{
+            show:false
+        },
+        axisTick: {
+            show: false
+        },
+        splitLine:{
+            show:false,
+            lineStyle:{
+                type:'dotted'
+            }
+        },
+        nameTextStyle:{
+            color:firstColor,
+            fontSize:16
+        },
+    };
+    yAxis_item_Bi = {
+        type: 'value',
+        min: 0,
+        axisLabel: {
+            formatter: '{value} k',
+            textStyle: {
+                color: secondColor,
+                fontSize:16
+            },
+            margin:'15'
+        },
+        axisLine:{
+            show:false
+        },
+        axisTick: {
+            show: false
+        },
+        splitLine:{
+            show:false,
+            lineStyle:{
+                type:'dotted'
+            }
+        },
+        nameTextStyle:{
+            color:secondColor,
+            fontSize:16
+        },
+    };
+    var option = {
+        tooltip: {
+            alwaysShowContent: true,
+            bordeRadius: 3,
+            borderWidth: 1,
+            borderColor:'#cfcfcf',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            padding: 10,
+            position: "top",
+            textStyle: {
+                fontSize: 14,
+                color: '#8F8F8F'
+            },
+            formatter: function (params) {
+                var seriesName = params.seriesName;
+                var color = seriesName == str1  ? firstColor : secondColor;
+                var tip = "<div style='padding: 10px 0px;text-align:center;color:black;font-size: 20px;'><span style='color:"+color+"'>"+seriesName+':'+params.data.showValue+"</span></div>"
+                    +"<div style='padding: 5px'>同比增长:"+params.data.sameValue+"</div>"
+                    +"<div style='padding: 5px'>环比增长:"+params.data.differValue+"</div>";
+                return tip;
+            },
+        },
+        legend: {
+            left:'10%',
+            data:[str1,str2]
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: [ 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                data : ['周一','周二','周三','周四','周五','周六','周日'],
+                axisLabel: {
+                    show: true,
+                    textStyle: {
+                        fontSize:'16'
+                    }
+                },
+            },{
+                type : 'category',
+                boundaryGap : false,
+                data : ['周一','周三','周五','周六','周日'],
+                axisLabel: {
+                    show: true,
+                    textStyle: {
+                        fontSize:'16'
+                    }
+                },
+                offset:0
+            }
+        ],
+        yAxis : [],
+        series : [
+            {
+                type:'line',
+                name: str1,
+                yAxisIndex: 0,//基于第一个y轴
+                xAxisIndex: 0,//基于第二个x轴
+                itemStyle: {
+                    normal: {
+                        color:firstColor,
+                        fontSize:16,
+                        lineStyle:{color:firstColor}
+                    }
+                },
+                data:[
+                    {value:3,showValue:3000,sameValue:'30%',differValue:'20%'},
+                    {value:18.2,showValue:18.2,sameValue:'70%',differValue:'40%'},
+                    {value:4,showValue:4000,sameValue:'40%',differValue:'40%'},
+                    {value:7.91,showValue:7910,sameValue:'80%',differValue:'40%'},
+                    {value:3,showValue:3000,sameValue:'15%',differValue:'40%'},
+                    {value:13,showValue:13000,sameValue:'37%',differValue:'40%'},
+                    {value:1,showValue:1000,sameValue:'80%',differValue:'40%'},
+                ]
+            },
+            {
+                type:'line',
+                name: str2,
+                yAxisIndex: 1,//基于第二个y轴
+                xAxisIndex: 1,//基于第二个x轴
+                itemStyle: {
+                    normal: {
+                        color:secondColor,
+                        fontSize:16,
+                        lineStyle:{color:secondColor}
+                    }
+                },
+                data:[
+                    {value:50,showValue:50000,sameValue:'30%',differValue:'20%'},
+                    {value:8.2,showValue:820,sameValue:'70%',differValue:'40%'},
+                    {value:14,showValue:14000,sameValue:'40%',differValue:'40%'},
+                    {value:20,showValue:20000,sameValue:'15%',differValue:'40%'},
+                    {value:3,showValue:3000,sameValue:'37%',differValue:'40%'},
+
+                ]
+            },
+        ]
+    };
+    option.yAxis.push(yAxis_item,yAxis_item_Bi);
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+    $('canvas').css('width','100%');
+    $('#main>div').css('width','100%');
+    $('#main>div>canvas').css('width','100%');
+
+</script>
+</body>
+</html>

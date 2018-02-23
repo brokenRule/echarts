@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>折线图标</title>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="echarts.js"></script>
+</head>
+<body>
+<div id="main" style="width: 1500px;height:400px;"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    var str1 = '资讯更新量';
+    var str2 = '资讯阅读量';
+    function addN(str) {
+        var result='';
+       /* str = str = str.replace(/(\w{1})/g, RegExp.$1 + 'b');*/
+        for(var i=0,len=str.length;i<len;i++){
+            result += str[i];
+            result += '\n';
+        }
+        return result
+    }
+    // 指定图表的配置项和数据
+    var option = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: [ 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                data : ['周一','周二','周三','周四','周五','周六','周日']
+            }
+        ],
+        yAxis : [
+            {
+                type: 'value',
+                min: 0,
+                max: 20,
+                axisLabel: {
+                    formatter: '{value} k',
+                    textStyle: {
+                        color: 'red',
+                    }
+                },
+                axisLine:{
+                   show:false
+                },
+                axisTick: {
+                    show: false
+                },
+                name:addN(str1),
+                nameLocation:"middle",
+                nameGap:45,
+                nameTextStyle:{
+                    color:'red',
+                },
+                nameRotate:0
+            },
+            {
+                type : 'value',
+                min: 0,
+                max: 100,
+                axisLabel: {
+                    formatter: '{value} k',
+                    textStyle: {
+                        color: 'blue',
+                    }
+                },
+                axisLine:{
+                    show:false
+                },
+                axisTick: {
+                    show: false
+                },
+                name:addN(str2),
+                nameTextStyle:{
+                    color:'blue',
+                },
+                nameGap:45,
+                nameLocation:"middle",
+                nameRotate:0
+            }
+        ],
+        series : [
+            {
+                name:'同比',
+                type:'line',
+                itemStyle: {normal: {areaStyle: {type: 'default',color:'red'}}},
+                data:[3, 18.2, 4, 7.91, 3, 3, 1]
+            },
+            {
+                name:'环比',
+                type:'line',
+                yAxisIndex: 1,//基于第二个
+                itemStyle: {normal: {areaStyle: {type: 'default',color:'#228764'}}},
+                data:[13.2, 1.132, 6.019, 2.349, 1.209, 9.099, 20]
+            }
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+
+    var ary = [12000,232,30000,39090,23,1000,100000000,5000,52125,63222];
+    var str ='';
+
+
+    function numFormat(str) {
+        var reg  = /(\d)(?=((\d{3})+)$)/g; //零宽度正预测先行断言
+        str = str.replace(reg, "$1,");
+        return str;
+    }
+    
+    for(var i =0 ; i <ary.length;i++){
+        (function (i) {
+            str = ary[i].toString();
+            str = numFormat(str);
+            console.log(str,ary[i]);
+        }(i));
+
+    }
+
+
+</script>
+</body>
+</html>
